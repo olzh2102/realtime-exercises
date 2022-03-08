@@ -11,15 +11,22 @@ chat.addEventListener('submit', function (e) {
 });
 
 async function postNewMsg(user, text) {
-    // code goes here
+    const data = { user, text };
+
+    ws.send(JSON.stringify(data));
 }
 
 const ws = new WebSocket('ws://localhost:8080', ['json']);
-console.log(ws);
 
 ws.addEventListener('open', () => {
     console.log('connected');
     presence.innerText = 'connected';
+});
+
+ws.addEventListener('message', (evt) => {
+    const data = JSON.parse(evt.data);
+    allChat = data.msg;
+    render();
 });
 
 function render() {

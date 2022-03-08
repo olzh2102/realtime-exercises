@@ -40,6 +40,11 @@ server.on('upgrade', function (req, socket) {
     ];
 
     socket.write(headers.join('\r\n'));
+    socket.write(objToResponse({ msg: getMsgs() }));
+
+    socket.on('data', (buffer) => {
+        console.log(buffer);
+    });
 
     console.log('connection upgrade requested!');
 });
