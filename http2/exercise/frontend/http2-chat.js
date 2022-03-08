@@ -45,15 +45,30 @@ async function getNewMsgs() {
     presence.innerText = 'connected';
 
     let readerResponse;
-    try {
-        readerResponse = await reader.read();
+    let done;
+    do {
+        try {
+            readerResponse = await reader.read();
+        } catch (error) {
+            console.error('reader fail', error);
+            presence.innerText = 'not connected';
+            return;
+        }
+
         const chunk = utf8Decoder.decode(readerResponse.value, { stream: true });
-        console.log(chunk);
-    } catch (error) {
-        console.error('reader fail', error);
-        presence.innerText = 'not connected';
-        return;
-    }
+        done = readerResponse.done;
+
+        if (chunk) {
+            try {
+                const json = JSON.parse(chunk);
+                allChat = json.msg;
+                render();
+            } catch (error) {
+                console.error('parse error', e);
+            }
+        }
+    } while (!done);
+    presence.innerText = 'not connected';
 }
 
 function render() {
